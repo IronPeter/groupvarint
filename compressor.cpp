@@ -123,7 +123,7 @@ int main() {
             ptr = Decode16(ptr, dst, last);
             dst += 16;
         }
-        gigs += SIZE * 16.0 / 1024.0 / 1024.0 / 1024.0;
+        gigs += SIZE * 16.0 / 1000.0 / 1000.0 / 1000.0;
     }
     float cl2 = clock();
     float secs = (cl2 - cl1) / float(CLOCKS_PER_SEC);
@@ -134,6 +134,6 @@ int main() {
             printf("%d:%d\n", d0, d1);
         }
     }
-    printf("seconds %f gigs of ui32 per second of decompression %f\n", secs, gigs / secs);
+    printf("%f seconds %f billions of ui32 per second\n", secs, gigs / secs);
     return 0;
 };
