@@ -134,6 +134,6 @@ int main() {
             printf("%d:%d\n", d0, d1);
         }
     }
-    printf("%f %f\n", secs, gigs / secs);
+    printf("seconds %f gigs of ui32 per second of decompression %f\n", secs, gigs / secs);
     return 0;
 };
