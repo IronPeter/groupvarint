@@ -140,8 +140,10 @@ ui8 *Code16(const ui32 *deltas, ui8 *code) {
     if (maxv < 0xff) {
         code[0] = 0;
         ++code;
+        ui8 add = 0;
         for (size_t i = 0; i < 16; ++i) {
-            code[i] = (ui8)deltas[i];
+            add += (ui8)deltas[i];
+            code[i] = add;
         }
         return code + 16;
     } else if (maxv < 0xffff) {
@@ -169,8 +171,8 @@ const ui8 *Decode16(const ui8 *src, ui32 *volatile dst, __m128i &last) {
     ui8 val = src[0];
     ++src;
     if (val == 0) {
-        __m128i val = _mm_loadu_si128((const __m128i *)src);
-        __m128i vali = Integrate1(val);
+        __m128i vali = _mm_loadu_si128((const __m128i *)src);
+        //__m128i vali = Integrate1(val);
         __m128i shuf = _mm_shuffle_epi32(last, 0xff);
         __m128i v16_0 = _mm_unpacklo_epi8(vali, _mm_setzero_si128());
         __m128i v16_1 = _mm_unpackhi_epi8(vali, _mm_setzero_si128());
