@@ -167,7 +167,7 @@ ui8 *Code16(const ui32 *deltas, ui8 *code) {
 
 
 __attribute__((always_inline))
-const ui8 *Decode16(const ui8 *src, ui32 *volatile dst, __m128i &last) {
+const ui8 *Decode16(const ui8 *src, volatile ui32 *dst, __m128i &last) {
     ui8 val = src[0];
     ++src;
     if (val == 0) {
@@ -185,10 +185,10 @@ const ui8 *Decode16(const ui8 *src, ui32 *volatile dst, __m128i &last) {
         __m128i out2 = _mm_add_epi32(shuf, v32_2);
         __m128i out3 = _mm_add_epi32(shuf, v32_3);
         last = out3;
-        _mm_storeu_si128((__m128i *)dst + 0, out0);
-        _mm_storeu_si128((__m128i *)dst + 1, out1);
-        _mm_storeu_si128((__m128i *)dst + 2, out2);
-        _mm_storeu_si128((__m128i *)dst + 3, out3);
+        _mm_store_si128((__m128i *)dst + 0, out0);
+        _mm_store_si128((__m128i *)dst + 1, out1);
+        _mm_store_si128((__m128i *)dst + 2, out2);
+        _mm_store_si128((__m128i *)dst + 3, out3);
         return src + 16;
     } else if (val == 1) {
         size_t ind0 = src[0];
@@ -211,10 +211,10 @@ const ui8 *Decode16(const ui8 *src, ui32 *volatile dst, __m128i &last) {
         __m128i out2 = _mm_add_epi32(shuf, v32_2);
         __m128i out3 = _mm_add_epi32(shuf, v32_3);
         last = out3;
-        _mm_storeu_si128((__m128i *)dst + 0, out0);
-        _mm_storeu_si128((__m128i *)dst + 1, out1);
-        _mm_storeu_si128((__m128i *)dst + 2, out2);
-        _mm_storeu_si128((__m128i *)dst + 3, out3);
+        _mm_store_si128((__m128i *)dst + 0, out0);
+        _mm_store_si128((__m128i *)dst + 1, out1);
+        _mm_store_si128((__m128i *)dst + 2, out2);
+        _mm_store_si128((__m128i *)dst + 3, out3);
         return src;
     } else {
         size_t ind0 = src[0];
@@ -235,10 +235,10 @@ const ui8 *Decode16(const ui8 *src, ui32 *volatile dst, __m128i &last) {
         __m128i out3 = Integrate4(_mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)src), shuffles4[ind3]), out2);
         src += siz3;
         last = out3;
-        _mm_storeu_si128((__m128i *)dst + 0, out0);
-        _mm_storeu_si128((__m128i *)dst + 1, out1);
-        _mm_storeu_si128((__m128i *)dst + 2, out2);
-        _mm_storeu_si128((__m128i *)dst + 3, out3);
+        _mm_store_si128((__m128i *)dst + 0, out0);
+        _mm_store_si128((__m128i *)dst + 1, out1);
+        _mm_store_si128((__m128i *)dst + 2, out2);
+        _mm_store_si128((__m128i *)dst + 3, out3);
         return src;
     }
 }
@@ -246,7 +246,7 @@ const ui8 *Decode16(const ui8 *src, ui32 *volatile dst, __m128i &last) {
 #define SIZE (1024)
 
 ui8 buffer[SIZE * (8 + 64 + 1)];
-ui32 outbuffer[SIZE * 16];
+ui32 outbuffer[SIZE * 16] __attribute__((aligned(0x10)));
 ui32 delta[SIZE * 16];
 
 int main(int argc, char *argv[]) {
