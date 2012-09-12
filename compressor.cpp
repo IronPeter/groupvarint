@@ -243,7 +243,7 @@ const ui8 *Decode16(const ui8 *src, volatile ui32 *dst, __m128i &last) {
     }
 }
 
-#define SIZE (1024)
+#define SIZE (1024 * 1024 * 4)
 
 ui8 buffer[SIZE * (8 + 64 + 1)];
 ui32 outbuffer[SIZE * 16] __attribute__((aligned(0x10)));
@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
     Init();
     int bits = atoi(argv[1]);
     for (size_t j = 0; j < SIZE * 16; ++j) {
-        delta[j] = (rand() % (1 << bits));// + (rand() & 256) * (rand() % 256);
+        delta[j] = (rand() % (1 << bits));
     }
     ui8 *code = buffer;
     for (size_t j = 0; j < SIZE * 16; j += 16) {
@@ -269,14 +269,25 @@ int main(int argc, char *argv[]) {
         const ui8 *ptr = buffer;
         ui32 *dst = outbuffer;
         __m128i last = _mm_setzero_si128();
-        for (size_t i = 0; i < SIZE; ++i) {
-            ptr = Decode16(ptr, dst, last);
-            dst += 16;
+        for (size_t i = 0; i < SIZE; i += 4) {
+            ptr = Decode16(ptr, dst + 0 * 16, last);
+            ptr = Decode16(ptr, dst + 1 * 16, last);
+            ptr = Decode16(ptr, dst + 2 * 16, last);
+            ptr = Decode16(ptr, dst + 3 * 16, last);
         }
         gigs += SIZE * 16.0 / 1000.0 / 1000.0 / 1000.0;
     }
     float cl2 = clock();
     float secs = (cl2 - cl1) / float(CLOCKS_PER_SEC);
+
+    const ui8 *ptr = buffer;
+    ui32 *dst = outbuffer;
+    __m128i last = _mm_setzero_si128();
+    for (size_t i = 0; i < SIZE; ++i) {
+        ptr = Decode16(ptr, dst, last);
+        dst += 16;
+    }
+
     for (size_t j = 0; j < SIZE * 16; ++j) {
         ui32 d0 = outbuffer[j] - (j == 0 ? 0 : outbuffer[j - 1]);
         ui32 d1 = delta[j];
